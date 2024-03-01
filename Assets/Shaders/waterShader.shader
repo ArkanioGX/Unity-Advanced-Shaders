@@ -44,11 +44,12 @@ Shader "Unlit/WaterShader"
             {
                 float4 pos : SV_POSITION;
                 float4 texcoord: TEXCOORD0;
+                float heightValue: DISPLACEMENT ;
             };
 
             float4 vertexAnimWater(float4 pos, float2 uv)
             {
-               pos.y = pos.y + (sin((uv.x - _Time.y * _Speed) * _Frequency) * _Amplitude);
+               pos.y = (sin((uv.x - _Time.y * _Speed) * _Frequency) * _Amplitude);
                return pos;
             }
 
@@ -60,10 +61,10 @@ Shader "Unlit/WaterShader"
                VertexOutput o;
 
                float displacement = tex2Dlod(_NoiseTex, v.texcoord* _NoiseTex_ST);
-               o.pos = UnityObjectToClipPos(v.vertex + (v.normal * displacement*0.1f ));
-               o.pos = vertexAnimWater(o.pos,v.texcoord);
+               o.pos =  UnityObjectToClipPos(v.vertex + (v.normal * displacement*0.1f ) * vertexAnimWater(v.vertex,v.texcoord));
+               o.heightValue = ((displacement + ((vertexAnimWater(v.vertex,v.texcoord).y)/(_Amplitude))+1)*0.5)*0.7;
 
-               o.texcoord.xy = v.texcoord;
+  
                o.texcoord.xy = (v.texcoord.xy * _NoiseTex_ST.xy + _NoiseTex_ST.zw);
 
                return o;
@@ -72,7 +73,7 @@ Shader "Unlit/WaterShader"
 
             half4 frag (VertexOutput i) : Color
             {
-                float4 color = lerp(_Color1,_Color2,tex2D(_NoiseTex, i.texcoord).r);
+                float4 color = lerp(_Color1,_Color2,clamp(i.heightValue, 0, 1));
                 return color;
             }
             ENDCG
