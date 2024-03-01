@@ -28,11 +28,15 @@ Shader "Unlit/WaterShader"
             uniform float _Frequency;
             uniform float _Amplitude;
 
+            
+            
+
             struct VertexInput
            {
                float4 vertex: POSITION;
                float4 normal: NORMAL;
                float4 texcoord: TEXCOORD0;
+               float4 tangent: TANGENT;
            };
 
 
@@ -48,6 +52,7 @@ Shader "Unlit/WaterShader"
                return pos;
             }
 
+
             uniform sampler2D _NoiseTex;
 
             VertexOutput vert(VertexInput v)
@@ -60,8 +65,6 @@ Shader "Unlit/WaterShader"
 
                o.texcoord.xy = v.texcoord;
                o.texcoord.xy = (v.texcoord.xy * _NoiseTex_ST.xy + _NoiseTex_ST.zw);
-
-              
 
                return o;
            }

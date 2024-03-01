@@ -17,6 +17,8 @@ Shader "Unlit/FlagShader"
 
         Pass
         {
+            LOD 200
+            Cull Off
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
