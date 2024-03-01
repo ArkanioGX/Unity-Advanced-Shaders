@@ -4,6 +4,8 @@ Shader "Unlit/FadeoutShader"
     {
         _Color ("Main Color", Color) = (1,1,1,1)
         _MainTex("Main Texture", 2D) = "white"{}
+        _Color1 ("Second Color", Color) = (1,1,1,1)
+        _MainTex1("Second Texture", 2D) = "white"{}
     }
     SubShader
     {
@@ -21,6 +23,7 @@ Shader "Unlit/FadeoutShader"
             #pragma vertex vert
             #pragma fragment frag
             uniform half4 _Color;
+            uniform half4 _Color1;
             uniform float4 _MainTex_ST;
 
             struct VertexInput
@@ -37,6 +40,7 @@ Shader "Unlit/FadeoutShader"
             };
 
             uniform sampler2D _MainTex;
+            uniform sampler2D _MainTex1;
 
             VertexOutput vert(VertexInput v)
            {
@@ -50,8 +54,11 @@ Shader "Unlit/FadeoutShader"
 
             half4 frag (VertexOutput i) : Color
             {
-                float4 color = tex2D(_MainTex, i.texcoord) * _Color;
-                color.a = color.a * sqrt(i.texcoord.y);
+                float4 color1 = tex2D(_MainTex, i.texcoord) * _Color;
+                float4 color2 = tex2D(_MainTex1, i.texcoord) * _Color1;
+                color1.a = i.texcoord.x;
+                color2.a = 1-i.texcoord.x;
+                float4 color = (color1 * color1.a) + (color2 * color2.a);
                 return color;
 
             }
